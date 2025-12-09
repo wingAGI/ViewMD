@@ -83,7 +83,7 @@ header p {
     background: var(--card-bg);
     border: 2px dashed var(--border-color);
     border-radius: 16px;
-    padding: 120px 40px;
+    padding: 160px 40px;
     text-align: center;
     cursor: pointer;
     transition: all var(--transition-base);
@@ -217,7 +217,7 @@ header p {
     background: var(--text-primary);
     color: #ffffff;
     border: none;
-    padding: 10px 20px;
+    padding: 10px 14px;
     border-radius: 10px;
     cursor: pointer;
     font-size: 0.875em;
@@ -227,18 +227,16 @@ header p {
     box-shadow: var(--shadow-sm);
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    justify-content: center;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Inter', 'Helvetica Neue', sans-serif;
 }
 
 .clear-btn:hover {
     background: var(--text-primary);
-    transform: translateY(-1px);
     box-shadow: var(--shadow-md);
 }
 
 .clear-btn:active {
-    transform: translateY(0);
     box-shadow: var(--shadow-sm);
 }
 
@@ -246,18 +244,22 @@ header p {
     width: 16px;
     height: 16px;
     flex-shrink: 0;
-    transition: transform var(--transition-fast), opacity var(--transition-fast);
+    transition: opacity var(--transition-fast);
     opacity: 0.95;
+    display: block;
+    vertical-align: middle;
 }
 
 .clear-btn:hover .clear-icon {
-    transform: rotate(90deg);
     opacity: 1;
 }
 
 .clear-text {
     font-weight: 500;
     letter-spacing: -0.01em;
+    line-height: 1;
+    display: flex;
+    align-items: center;
 }
 
 .content-area {
@@ -318,13 +320,13 @@ body.fullscreen-mode .content-area.drag-over {
     display: none;
     position: fixed;
     top: 32px;
-    left: 32px;
+    right: 32px;
     background: rgba(26, 26, 26, 0.95);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     color: #ffffff;
     border: none;
-    padding: 12px 24px;
+    padding: 12px 16px;
     border-radius: 12px;
     cursor: pointer;
     font-size: 0.875em;
@@ -332,17 +334,18 @@ body.fullscreen-mode .content-area.drag-over {
     transition: all var(--transition-fast);
     z-index: 1000;
     box-shadow: var(--shadow-lg);
+    display: flex;
     align-items: center;
-    gap: 10px;
+    justify-content: center;
     letter-spacing: -0.01em;
-    animation: slideInLeft 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: slideInRight 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Inter', 'Helvetica Neue', sans-serif;
 }
 
-@keyframes slideInLeft {
+@keyframes slideInRight {
     from {
         opacity: 0;
-        transform: translateX(-16px);
+        transform: translateX(16px);
     }
     to {
         opacity: 1;
@@ -356,12 +359,10 @@ body.fullscreen-mode .clear-btn-fullscreen {
 
 .clear-btn-fullscreen:hover {
     background: rgba(26, 26, 26, 1);
-    transform: translateY(-2px);
     box-shadow: var(--shadow-xl);
 }
 
 .clear-btn-fullscreen:active {
-    transform: translateY(0);
     box-shadow: var(--shadow-lg);
 }
 
@@ -369,18 +370,22 @@ body.fullscreen-mode .clear-btn-fullscreen {
     width: 16px;
     height: 16px;
     flex-shrink: 0;
-    transition: transform var(--transition-fast), opacity var(--transition-fast);
+    transition: opacity var(--transition-fast);
     opacity: 0.95;
+    display: block;
+    vertical-align: middle;
 }
 
 .clear-btn-fullscreen:hover .clear-icon-fullscreen {
-    transform: rotate(90deg);
     opacity: 1;
 }
 
 .clear-text-fullscreen {
     font-weight: 500;
     letter-spacing: -0.01em;
+    line-height: 1;
+    display: flex;
+    align-items: center;
 }
 
 .markdown-content {
