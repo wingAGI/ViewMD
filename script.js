@@ -134,21 +134,41 @@ function handleDrop(e) {
         return;
     }
     
+    // 调试信息：记录拖放事件的详细信息
+    console.log('拖放事件触发，调试信息:', {
+        types: Array.from(dataTransfer.types || []),
+        itemsLength: dataTransfer.items?.length || 0,
+        filesLength: dataTransfer.files?.length || 0,
+        effectAllowed: dataTransfer.effectAllowed,
+        dropEffect: dataTransfer.dropEffect
+    });
+    
     let fileFound = false;
     let file = null;
     
     // 优先使用 items API（支持从编辑器/IDE拖放）
     if (dataTransfer.items && dataTransfer.items.length > 0) {
+        console.log('尝试使用 items API，items 数量:', dataTransfer.items.length);
         for (let i = 0; i < dataTransfer.items.length; i++) {
             const item = dataTransfer.items[i];
+            console.log(`Item ${i}:`, {
+                kind: item.kind,
+                type: item.type
+            });
             
             // 检查是否是文件类型
             if (item.kind === 'file') {
                 try {
                     file = item.getAsFile();
+                    console.log('从 item 获取文件:', file ? {
+                        name: file.name,
+                        size: file.size,
+                        type: file.type
+                    } : 'null');
                     // 检查文件对象是否有效
                     if (file && (file instanceof File || file instanceof Blob)) {
                         fileFound = true;
+                        console.log('成功找到文件（通过 items API）');
                         break;
                     }
                 } catch (err) {
@@ -156,17 +176,36 @@ function handleDrop(e) {
                     // 继续尝试其他方法
                 }
             }
+            // 某些编辑器可能使用 'string' 类型传递文件路径或内容
+            else if (item.kind === 'string' && item.type === 'text/plain') {
+                console.log('检测到 text/plain 类型，可能是文件路径');
+                // 尝试获取字符串内容（可能是文件路径）
+                try {
+                    item.getAsString(function(str) {
+                        console.log('获取到的字符串内容:', str.substring(0, 100));
+                    });
+                } catch (err) {
+                    console.warn('无法获取字符串内容:', err);
+                }
+            }
         }
     }
     
     // 回退到 files API（支持从文件管理器拖放）
     if (!fileFound && dataTransfer.files && dataTransfer.files.length > 0) {
+        console.log('尝试使用 files API，files 数量:', dataTransfer.files.length);
         for (let i = 0; i < dataTransfer.files.length; i++) {
             const f = dataTransfer.files[i];
+            console.log(`File ${i}:`, {
+                name: f.name,
+                size: f.size,
+                type: f.type
+            });
             // 检查文件对象是否有效
             if (f && (f instanceof File || f instanceof Blob)) {
                 file = f;
                 fileFound = true;
+                console.log('成功找到文件（通过 files API）');
                 break;
             }
         }
@@ -176,16 +215,28 @@ function handleDrop(e) {
     if (fileFound && file) {
         handleFileWithCheck(file);
     } else {
-        // 调试信息（仅在开发环境输出）
-        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-            console.warn('未找到文件:', {
-                hasItems: !!dataTransfer.items,
-                itemsLength: dataTransfer.items?.length || 0,
-                hasFiles: !!dataTransfer.files,
-                filesLength: dataTransfer.files?.length || 0,
-                types: Array.from(dataTransfer.types || [])
-            });
+        // 调试信息（生产环境也输出，方便排查问题）
+        const debugInfo = {
+            hasItems: !!dataTransfer.items,
+            itemsLength: dataTransfer.items?.length || 0,
+            hasFiles: !!dataTransfer.files,
+            filesLength: dataTransfer.files?.length || 0,
+            types: Array.from(dataTransfer.types || []),
+            items: []
+        };
+        
+        // 收集 items 的详细信息
+        if (dataTransfer.items && dataTransfer.items.length > 0) {
+            for (let i = 0; i < dataTransfer.items.length; i++) {
+                const item = dataTransfer.items[i];
+                debugInfo.items.push({
+                    kind: item.kind,
+                    type: item.type
+                });
+            }
         }
+        
+        console.warn('未找到文件，调试信息:', debugInfo);
         alert('请拖放 Markdown 文件 (.md 或 .markdown)');
     }
 }
