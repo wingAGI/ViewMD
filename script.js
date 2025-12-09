@@ -7,6 +7,7 @@ const clearBtn = document.getElementById('clearBtn');
 const clearBtnFullscreen = document.getElementById('clearBtnFullscreen');
 const contentArea = document.getElementById('contentArea');
 const markdownContent = document.getElementById('markdownContent');
+const notification = document.getElementById('notification');
 
 // 配置 marked 选项
 if (typeof marked !== 'undefined') {
@@ -103,6 +104,66 @@ fileInput.addEventListener('change', function(e) {
         handleFile(files[0]);
     }
 });
+
+// 从字符串 items 中提取文件名
+async function extractFileNameFromStringItems(stringItems) {
+    for (const item of stringItems) {
+        try {
+            const content = await new Promise((resolve) => {
+                item.getAsString(resolve);
+            });
+            
+            // 尝试从 URI 列表中提取文件路径
+            const lines = content.split('\n').filter(line => line.trim());
+            for (const line of lines) {
+                const trimmedLine = line.trim();
+                // 检查是否是文件路径（不以 http:// 或 https:// 开头）
+                if (trimmedLine && !trimmedLine.startsWith('http://') && !trimmedLine.startsWith('https://')) {
+                    // 提取文件名（支持 Unix 和 Windows 路径）
+                    const fileName = trimmedLine.split('/').pop() || trimmedLine.split('\\').pop();
+                    if (fileName) {
+                        return fileName;
+                    }
+                }
+            }
+        } catch (err) {
+            console.warn('无法获取字符串内容:', err);
+        }
+    }
+    return null;
+}
+
+// 显示临时通知
+function showTemporaryNotification(message, duration = 2000) {
+    if (!notification) return;
+    
+    notification.textContent = message;
+    notification.style.display = 'block';
+    notification.classList.remove('fade-out');
+    
+    // 自动隐藏
+    setTimeout(() => {
+        notification.classList.add('fade-out');
+        setTimeout(() => {
+            notification.style.display = 'none';
+        }, 300);
+    }, duration);
+}
+
+// 打开文件选择器（带降级处理）
+function openFilePicker() {
+    if (fileInput.showPicker) {
+        // 现代浏览器：使用 showPicker API
+        fileInput.showPicker().catch(err => {
+            console.log('showPicker 失败，降级到点击:', err);
+            // 降级：如果 showPicker 失败，触发点击
+            fileInput.click();
+        });
+    } else {
+        // 旧浏览器：直接点击
+        fileInput.click();
+    }
+}
 
 // 清除功能
 function clearContent() {
@@ -238,9 +299,41 @@ function handleDrop(e) {
         
         // 如果只有字符串类型的 items，说明可能是从编辑器拖放的
         if (hasStringItems && !hasFileItems && (!dataTransfer?.files || dataTransfer.files.length === 0)) {
-            console.log('检测到从编辑器拖放，但无法直接读取文件');
-            // 提示用户使用文件选择器
-            alert('检测到您从编辑器拖放了文件。\n\n由于浏览器安全限制，无法直接从编辑器拖放中读取文件。\n\n请使用以下方法之一：\n1. 点击页面选择文件\n2. 从文件管理器（Finder/资源管理器）拖放文件');
+            console.log('检测到从编辑器拖放，尝试自动打开文件选择器');
+            
+            // 收集字符串类型的 items
+            const stringItems = [];
+            for (let i = 0; i < dataTransfer.items.length; i++) {
+                const item = dataTransfer.items[i];
+                if (item.kind === 'string') {
+                    const uriListTypes = [
+                        'text/uri-list',
+                        'text/plain',
+                        'application/vnd.code.uri-list'
+                    ];
+                    if (uriListTypes.includes(item.type) || item.type.startsWith('text/')) {
+                        stringItems.push(item);
+                    }
+                }
+            }
+            
+            // 异步提取文件名并打开文件选择器
+            (async () => {
+                const extractedFileName = await extractFileNameFromStringItems(stringItems);
+                
+                // 显示友好提示
+                if (extractedFileName) {
+                    showTemporaryNotification(`检测到文件：${extractedFileName}，正在打开文件选择器...`, 2500);
+                } else {
+                    showTemporaryNotification('检测到编辑器拖放，正在打开文件选择器...', 2000);
+                }
+                
+                // 延迟一点后自动打开文件选择器（让用户看到提示）
+                setTimeout(() => {
+                    openFilePicker();
+                }, 300);
+            })();
+            
             return;
         }
         
