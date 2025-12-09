@@ -1,21 +1,43 @@
-// 获取 DOM 元素
-const dropZone = document.getElementById('dropZone');
-const fileInput = document.getElementById('fileInput');
-const fileInfo = document.getElementById('fileInfo');
-const fileName = document.getElementById('fileName');
-const clearBtn = document.getElementById('clearBtn');
-const contentArea = document.getElementById('contentArea');
-const markdownContent = document.getElementById('markdownContent');
-
-// 配置 marked 选项
-if (typeof marked !== 'undefined') {
-    marked.setOptions({
-        breaks: true,
-        gfm: true,
-        headerIds: true,
-        mangle: false
-    });
-}
+// 确保 DOM 已加载
+(function() {
+    'use strict';
+    
+    // 检查 marked 库是否已加载
+    if (typeof marked === 'undefined') {
+        console.error('Marked library is not available');
+        document.body.insertAdjacentHTML('beforeend', 
+            '<div style="position:fixed;top:0;left:0;right:0;background:#ff6b6b;color:white;padding:10px;text-align:center;z-index:9999;">' +
+            'Markdown 解析库加载失败，请刷新页面重试。</div>');
+        return;
+    }
+    
+    // 获取 DOM 元素
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
+    const fileInfo = document.getElementById('fileInfo');
+    const fileName = document.getElementById('fileName');
+    const clearBtn = document.getElementById('clearBtn');
+    const contentArea = document.getElementById('contentArea');
+    const markdownContent = document.getElementById('markdownContent');
+    
+    // 检查必要的 DOM 元素是否存在
+    if (!dropZone || !fileInput || !fileInfo || !fileName || !clearBtn || !contentArea || !markdownContent) {
+        console.error('Required DOM elements not found');
+        return;
+    }
+    
+    // 配置 marked 选项
+    try {
+        marked.setOptions({
+            breaks: true,
+            gfm: true,
+            headerIds: true,
+            mangle: false
+        });
+        console.log('Marked library initialized successfully');
+    } catch (error) {
+        console.error('Error configuring marked:', error);
+    }
 
 // 处理文件读取和渲染
 function handleFile(file) {
@@ -34,10 +56,18 @@ function handleFile(file) {
         fileInfo.style.display = 'flex';
         
         // 渲染 Markdown
-        if (typeof marked !== 'undefined') {
-            markdownContent.innerHTML = marked.parse(content);
-        } else {
-            markdownContent.textContent = 'Markdown 解析库加载失败，请刷新页面重试。';
+        try {
+            if (typeof marked !== 'undefined' && typeof marked.parse === 'function') {
+                markdownContent.innerHTML = marked.parse(content);
+            } else {
+                markdownContent.innerHTML = '<div style="color:#ff6b6b;padding:20px;text-align:center;">' +
+                    'Markdown 解析库加载失败，请刷新页面重试。</div>';
+                console.error('Marked.parse is not available');
+            }
+        } catch (error) {
+            console.error('Error parsing markdown:', error);
+            markdownContent.innerHTML = '<div style="color:#ff6b6b;padding:20px;text-align:center;">' +
+                '渲染 Markdown 时出错：' + error.message + '</div>';
         }
         
         // 显示内容区域
@@ -106,3 +136,5 @@ document.addEventListener('dragover', function(e) {
 document.addEventListener('drop', function(e) {
     e.preventDefault();
 });
+
+})(); // 立即执行函数结束
