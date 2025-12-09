@@ -10,6 +10,12 @@ body {
     min-height: 100vh;
     padding: 20px;
     color: #333;
+    transition: all 0.3s ease;
+}
+
+body.fullscreen-mode {
+    background: #ffffff;
+    padding: 0;
 }
 
 .container {
@@ -120,6 +126,56 @@ header p {
     padding: 40px;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
     margin-bottom: 20px;
+    position: relative;
+}
+
+body.fullscreen-mode .content-area {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100vh;
+    border-radius: 0;
+    margin: 0;
+    padding: 60px 40px 40px;
+    overflow-y: auto;
+    box-shadow: none;
+    transition: all 0.3s ease;
+}
+
+body.fullscreen-mode .content-area.drag-over {
+    background: #f8f9ff;
+    border: 3px dashed #667eea;
+}
+
+.clear-btn-fullscreen {
+    display: none;
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #ff6b6b;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+body.fullscreen-mode .clear-btn-fullscreen {
+    display: block;
+}
+
+.clear-btn-fullscreen:hover {
+    background: #ff5252;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
 }
 
 .markdown-content {
