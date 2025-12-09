@@ -131,6 +131,7 @@ function handleDrop(e) {
     const dataTransfer = e.dataTransfer;
     if (!dataTransfer) {
         console.warn('dataTransfer 对象不存在');
+        alert('dataTransfer 对象不存在');
         return;
     }
     
@@ -142,6 +143,7 @@ function handleDrop(e) {
         effectAllowed: dataTransfer.effectAllowed,
         dropEffect: dataTransfer.dropEffect
     });
+
     
     let fileFound = false;
     let file = null;
@@ -237,6 +239,7 @@ function handleDrop(e) {
         }
         
         console.warn('未找到文件，调试信息:', debugInfo);
+        alert('未找到文件，调试信息:', debugInfo)
         alert('请拖放 Markdown 文件 (.md 或 .markdown)');
     }
 }
