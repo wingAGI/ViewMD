@@ -3,9 +3,6 @@
   "version": "1.0.0",
   "description": "一个简单美观的 Markdown 文件查看器",
   "main": "index.html",
-  "scripts": {
-    "start": "npx http-server -p 8000 -o"
-  },
   "keywords": [
     "markdown",
     "viewer",

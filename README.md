@@ -27,22 +27,40 @@
 
 ## 本地开发
 
+### 方法一：直接打开（最简单）
+
 无需安装任何依赖，直接在浏览器中打开 `index.html` 即可使用。
 
-如果需要本地服务器（推荐，避免某些浏览器的文件访问限制）：
+**注意：** 某些浏览器（如 Chrome）可能因为安全策略限制本地文件访问，如果遇到问题，请使用方法二。
+
+### 方法二：使用本地服务器（推荐）
+
+使用本地服务器可以避免浏览器的文件访问限制，推荐使用：
 
 ```bash
-# 使用 Python
+# 使用 Python（Python 3）
 python -m http.server 8000
 
+# 或使用 Python 2
+python -m SimpleHTTPServer 8000
+
 # 使用 Node.js (需要安装 http-server)
-npx http-server
+npx http-server -p 8000 -o
 
 # 使用 PHP
 php -S localhost:8000
+
+# 使用 Ruby
+ruby -run -e httpd . -p 8000
 ```
 
 然后在浏览器中访问 `http://localhost:8000`
+
+### 调试技巧
+
+- 打开浏览器开发者工具（F12）查看控制台错误
+- 检查网络请求，确保资源文件（CSS、JS）正确加载
+- 测试拖放功能时，确保文件扩展名为 `.md` 或 `.markdown`
 
 ## 部署指南
 
@@ -90,6 +108,11 @@ php -S localhost:8000
    - 添加你的域名（如：markdown-viewer.com）
    - 按照提示配置 DNS 记录（添加 CNAME 记录）
    - 等待 SSL 证书自动配置（通常几分钟）
+
+**重要提示：**
+- ✅ 确保所有资源路径使用相对路径（如 `./styles.css` 而不是 `/styles.css`）
+- ✅ `package.json` 中不要包含 `start` 或 `build` 脚本，避免 Vercel 误判为 Node.js 项目
+- ✅ 项目已配置为纯静态网站，无需构建步骤
 
 ### 🌐 Netlify
 
