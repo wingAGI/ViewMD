@@ -218,28 +218,53 @@ function handleDrop(e) {
         handleFileWithCheck(file);
     } else {
         // 调试信息（生产环境也输出，方便排查问题）
+        // 确保 dataTransfer 存在后再访问其属性
         const debugInfo = {
-            hasItems: !!dataTransfer.items,
-            itemsLength: dataTransfer.items?.length || 0,
-            hasFiles: !!dataTransfer.files,
-            filesLength: dataTransfer.files?.length || 0,
-            types: Array.from(dataTransfer.types || []),
+            dataTransferExists: !!dataTransfer,
+            hasItems: !!dataTransfer?.items,
+            itemsLength: dataTransfer?.items?.length ?? 0,
+            hasFiles: !!dataTransfer?.files,
+            filesLength: dataTransfer?.files?.length ?? 0,
+            types: dataTransfer?.types ? Array.from(dataTransfer.types) : [],
+            effectAllowed: dataTransfer?.effectAllowed ?? null,
+            dropEffect: dataTransfer?.dropEffect ?? null,
             items: []
         };
         
         // 收集 items 的详细信息
-        if (dataTransfer.items && dataTransfer.items.length > 0) {
+        if (dataTransfer?.items && dataTransfer.items.length > 0) {
             for (let i = 0; i < dataTransfer.items.length; i++) {
                 const item = dataTransfer.items[i];
-                debugInfo.items.push({
-                    kind: item.kind,
-                    type: item.type
+                try {
+                    debugInfo.items.push({
+                        kind: item.kind ?? 'unknown',
+                        type: item.type ?? 'unknown'
+                    });
+                } catch (err) {
+                    debugInfo.items.push({
+                        kind: 'error',
+                        type: `无法访问 item ${i}: ${err.message}`
+                    });
+                }
+            }
+        }
+        
+        // 收集 files 的详细信息
+        if (dataTransfer?.files && dataTransfer.files.length > 0) {
+            debugInfo.files = [];
+            for (let i = 0; i < dataTransfer.files.length; i++) {
+                const f = dataTransfer.files[i];
+                debugInfo.files.push({
+                    name: f.name ?? 'unknown',
+                    size: f.size ?? 0,
+                    type: f.type ?? 'unknown'
                 });
             }
         }
         
         console.warn('未找到文件，调试信息:', debugInfo);
-        alert('未找到文件，调试信息:', debugInfo)
+        // 修复 alert：将对象转换为 JSON 字符串
+        alert('未找到文件，调试信息:\n' + JSON.stringify(debugInfo, null, 2));
         alert('请拖放 Markdown 文件 (.md 或 .markdown)');
     }
 }
