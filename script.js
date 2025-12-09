@@ -151,6 +151,10 @@ function handleDrop(e) {
     // 优先使用 items API（支持从编辑器/IDE拖放）
     if (dataTransfer.items && dataTransfer.items.length > 0) {
         console.log('尝试使用 items API，items 数量:', dataTransfer.items.length);
+        
+        // 收集所有字符串类型的 items（用于处理 URI 列表）
+        const stringItems = [];
+        
         for (let i = 0; i < dataTransfer.items.length; i++) {
             const item = dataTransfer.items[i];
             console.log(`Item ${i}:`, {
@@ -178,18 +182,25 @@ function handleDrop(e) {
                     // 继续尝试其他方法
                 }
             }
-            // 某些编辑器可能使用 'string' 类型传递文件路径或内容
-            else if (item.kind === 'string' && item.type === 'text/plain') {
-                console.log('检测到 text/plain 类型，可能是文件路径');
-                // 尝试获取字符串内容（可能是文件路径）
-                try {
-                    item.getAsString(function(str) {
-                        console.log('获取到的字符串内容:', str.substring(0, 100));
-                    });
-                } catch (err) {
-                    console.warn('无法获取字符串内容:', err);
+            // 收集字符串类型的 items（可能是文件路径或 URI 列表）
+            else if (item.kind === 'string') {
+                const uriListTypes = [
+                    'text/uri-list',
+                    'text/plain',
+                    'application/vnd.code.uri-list'
+                ];
+                
+                if (uriListTypes.includes(item.type) || item.type.startsWith('text/')) {
+                    stringItems.push(item);
+                    console.log(`收集到字符串类型 item: ${item.type}`);
                 }
             }
+        }
+        
+        // 记录字符串类型的 items（用于后续调试）
+        if (stringItems.length > 0) {
+            console.log(`检测到 ${stringItems.length} 个字符串类型的 items，类型:`, 
+                stringItems.map(item => item.type));
         }
     }
     
@@ -217,6 +228,22 @@ function handleDrop(e) {
     if (fileFound && file) {
         handleFileWithCheck(file);
     } else {
+        // 检查是否只有字符串类型的 items（可能是从编辑器拖放的）
+        const hasStringItems = dataTransfer?.items && Array.from(dataTransfer.items).some(item => 
+            item.kind === 'string'
+        );
+        const hasFileItems = dataTransfer?.items && Array.from(dataTransfer.items).some(item => 
+            item.kind === 'file'
+        );
+        
+        // 如果只有字符串类型的 items，说明可能是从编辑器拖放的
+        if (hasStringItems && !hasFileItems && (!dataTransfer?.files || dataTransfer.files.length === 0)) {
+            console.log('检测到从编辑器拖放，但无法直接读取文件');
+            // 提示用户使用文件选择器
+            alert('检测到您从编辑器拖放了文件。\n\n由于浏览器安全限制，无法直接从编辑器拖放中读取文件。\n\n请使用以下方法之一：\n1. 点击页面选择文件\n2. 从文件管理器（Finder/资源管理器）拖放文件');
+            return;
+        }
+        
         // 调试信息（生产环境也输出，方便排查问题）
         // 确保 dataTransfer 存在后再访问其属性
         const debugInfo = {
