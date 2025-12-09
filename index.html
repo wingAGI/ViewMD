@@ -1,48 +1,54 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Markdown 查看器</title>
+    <title>View Your Markdown Easily</title>
     <link rel="icon" type="image/svg+xml" href="./favicon.svg">
     <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>📄 Markdown 查看器</h1>
-            <p>拖放 .md 文件到下方区域即可查看渲染结果</p>
+            <h1>View Your Markdown Easily</h1>
         </header>
 
         <div id="dropZone" class="drop-zone">
             <div class="drop-zone-content">
-                <svg class="drop-icon" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <svg class="drop-icon" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                     <polyline points="17 8 12 3 7 8"></polyline>
                     <line x1="12" y1="3" x2="12" y2="15"></line>
                 </svg>
-                <p class="drop-text">拖放 Markdown 文件到这里</p>
-                <p class="drop-hint">或点击选择文件</p>
+                <p class="drop-text">Drop Markdown files here</p>
+                <p class="drop-hint">or click to select file</p>
                 <input type="file" id="fileInput" accept=".md,.markdown" style="display: none;">
             </div>
         </div>
 
         <div id="fileInfo" class="file-info" style="display: none;">
             <span id="fileName"></span>
-            <button id="clearBtn" class="clear-btn">清除</button>
+            <button id="clearBtn" class="clear-btn">
+                <svg class="clear-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+                <span class="clear-text">Clear</span>
+            </button>
         </div>
 
         <div id="contentArea" class="content-area" style="display: none;">
             <button id="clearBtnFullscreen" class="clear-btn-fullscreen">
-                <svg class="back-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M19 12H5M12 19l-7-7 7-7"/>
+                <svg class="clear-icon-fullscreen" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
                 </svg>
-                清除
+                <span class="clear-text-fullscreen">Clear</span>
             </button>
             <div id="markdownContent" class="markdown-content"></div>
         </div>
         
-        <!-- 临时通知 -->
+        <!-- Temporary notification -->
         <div id="notification" class="notification" style="display: none;"></div>
     </div>
 
