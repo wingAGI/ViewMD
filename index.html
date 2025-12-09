@@ -37,51 +37,7 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js" 
-            onerror="console.error('Failed to load marked.js from CDN'); window.markedLoadError = true;"></script>
-    <script>
-        // 等待 marked 库加载完成
-        function waitForMarked(callback, maxAttempts = 50) {
-            let attempts = 0;
-            const checkMarked = () => {
-                attempts++;
-                if (typeof marked !== 'undefined' && marked.parse) {
-                    callback();
-                } else if (attempts < maxAttempts && !window.markedLoadError) {
-                    setTimeout(checkMarked, 100);
-                } else {
-                    console.error('Marked library failed to load');
-                    // 尝试备用CDN
-                    if (!window.markedLoadError) {
-                        console.log('Trying backup CDN...');
-                        const backupScript = document.createElement('script');
-                        backupScript.src = 'https://unpkg.com/marked/marked.min.js';
-                        backupScript.onerror = function() {
-                            console.error('Backup CDN also failed');
-                            document.body.insertAdjacentHTML('beforeend', 
-                                '<div style="position:fixed;top:0;left:0;right:0;background:#ff6b6b;color:white;padding:10px;text-align:center;z-index:9999;">' +
-                                'Markdown 解析库加载失败，请刷新页面重试。如果问题持续，请检查网络连接。</div>');
-                        };
-                        backupScript.onload = function() {
-                            console.log('Backup CDN loaded successfully');
-                            callback();
-                        };
-                        document.head.appendChild(backupScript);
-                    }
-                }
-            };
-            checkMarked();
-        }
-        
-        // 加载主脚本
-        waitForMarked(function() {
-            const script = document.createElement('script');
-            script.src = './script.js';
-            script.onerror = function() {
-                console.error('Failed to load script.js');
-            };
-            document.body.appendChild(script);
-        });
-    </script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="./script.js"></script>
 </body>
 </html>

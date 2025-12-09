@@ -3,11 +3,17 @@
   "version": "1.0.0",
   "description": "一个简单美观的 Markdown 文件查看器",
   "main": "index.html",
+  "scripts": {
+    "dev": "npx http-server -p 8000 -o -c-1"
+  },
   "keywords": [
     "markdown",
     "viewer",
     "drag-drop"
   ],
   "author": "",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  }
 }
