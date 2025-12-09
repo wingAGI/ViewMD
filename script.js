@@ -129,7 +129,13 @@ clearBtnFullscreen.addEventListener('click', clearContent);
 // 处理拖放事件（支持多种拖放源）
 function handleDrop(e) {
     const dataTransfer = e.dataTransfer;
+    if (!dataTransfer) {
+        console.warn('dataTransfer 对象不存在');
+        return;
+    }
+    
     let fileFound = false;
+    let file = null;
     
     // 优先使用 items API（支持从编辑器/IDE拖放）
     if (dataTransfer.items && dataTransfer.items.length > 0) {
@@ -138,36 +144,61 @@ function handleDrop(e) {
             
             // 检查是否是文件类型
             if (item.kind === 'file') {
-                const file = item.getAsFile();
-                if (file) {
-                    fileFound = true;
-                    // 对于从编辑器拖放的文件，更宽松地接受
-                    handleFileWithCheck(file);
-                    return;
+                try {
+                    file = item.getAsFile();
+                    // 检查文件对象是否有效
+                    if (file && (file instanceof File || file instanceof Blob)) {
+                        fileFound = true;
+                        break;
+                    }
+                } catch (err) {
+                    console.warn('无法从 item 获取文件:', err);
+                    // 继续尝试其他方法
                 }
             }
         }
     }
     
     // 回退到 files API（支持从文件管理器拖放）
-    if (dataTransfer.files && dataTransfer.files.length > 0) {
+    if (!fileFound && dataTransfer.files && dataTransfer.files.length > 0) {
         for (let i = 0; i < dataTransfer.files.length; i++) {
-            const file = dataTransfer.files[i];
-            if (file) {
+            const f = dataTransfer.files[i];
+            // 检查文件对象是否有效
+            if (f && (f instanceof File || f instanceof Blob)) {
+                file = f;
                 fileFound = true;
-                handleFileWithCheck(file);
-                return;
+                break;
             }
         }
     }
     
-    if (!fileFound) {
+    // 如果找到了文件，处理它
+    if (fileFound && file) {
+        handleFileWithCheck(file);
+    } else {
+        // 调试信息（仅在开发环境输出）
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+            console.warn('未找到文件:', {
+                hasItems: !!dataTransfer.items,
+                itemsLength: dataTransfer.items?.length || 0,
+                hasFiles: !!dataTransfer.files,
+                filesLength: dataTransfer.files?.length || 0,
+                types: Array.from(dataTransfer.types || [])
+            });
+        }
         alert('请拖放 Markdown 文件 (.md 或 .markdown)');
     }
 }
 
 // 处理文件并检查内容（如果文件名不符合要求，尝试读取内容判断）
 function handleFileWithCheck(file) {
+    // 验证文件对象
+    if (!file || !(file instanceof File)) {
+        console.warn('无效的文件对象:', file);
+        alert('请拖放 Markdown 文件 (.md 或 .markdown)');
+        return;
+    }
+    
     const fileName = (file.name || '').toLowerCase();
     
     // 如果文件名明确是 Markdown 文件，直接处理
@@ -178,6 +209,14 @@ function handleFileWithCheck(file) {
     
     // 如果文件名没有扩展名或不符合要求，尝试读取文件内容来判断
     // 这对于从编辑器（如 Cursor）拖放的文件很有用
+    // 对于没有文件名或扩展名的文件，直接接受（可能是从编辑器拖放的）
+    if (!fileName || fileName === '' || !fileName.includes('.')) {
+        // 直接接受没有扩展名的文件（通常是从编辑器拖放的）
+        handleFile(file);
+        return;
+    }
+    
+    // 如果有扩展名但不是 .md/.markdown，尝试读取内容判断
     const reader = new FileReader();
     
     reader.onload = function(e) {
@@ -199,9 +238,8 @@ function handleFileWithCheck(file) {
         const sampleContent = content.substring(0, Math.min(500, content.length));
         const isMarkdown = markdownPatterns.some(pattern => pattern.test(sampleContent));
         
-        // 如果没有扩展名，或者内容看起来像 Markdown，就接受它
-        // 对于从编辑器拖放的文件，通常没有扩展名，我们更宽松地接受
-        if (fileName === '' || !fileName.includes('.') || isMarkdown) {
+        // 如果内容看起来像 Markdown，就接受它
+        if (isMarkdown) {
             handleFile(file);
         } else {
             alert('请拖放 Markdown 文件 (.md 或 .markdown)');
@@ -210,7 +248,7 @@ function handleFileWithCheck(file) {
     
     reader.onerror = function() {
         // 如果读取失败，但文件名没有扩展名，仍然尝试处理（可能是从编辑器拖放的）
-        if (fileName === '' || !fileName.includes('.')) {
+        if (!fileName || fileName === '' || !fileName.includes('.')) {
             handleFile(file);
         } else {
             alert('读取文件失败，请重试。');
@@ -225,13 +263,24 @@ function handleFileWithCheck(file) {
 }
 
 // 全局拖放事件处理 - 允许在整个页面上拖放文件
-// 使用捕获阶段，确保能捕获到所有拖放事件
+// 只在目标不是 dropZone 或 contentArea 时才处理，避免干扰正常的拖放区域
 document.addEventListener('dragover', function(e) {
+    const target = e.target;
+    const isDropZone = dropZone.contains(target);
+    const isContentArea = contentArea.contains(target);
+    
+    // 如果已经在 dropZone 或 contentArea 上，让它们自己处理
+    if (isDropZone || isContentArea) {
+        return;
+    }
+    
     // 检查是否有文件被拖放
     if (e.dataTransfer && e.dataTransfer.types) {
-        const hasFiles = Array.from(e.dataTransfer.types).some(type => 
+        const types = Array.from(e.dataTransfer.types);
+        const hasFiles = types.some(type => 
             type === 'Files' || 
             type === 'application/x-moz-file' ||
+            type === 'text/plain' || // 某些编辑器可能使用这个类型
             type.startsWith('application/')
         );
         if (hasFiles) {
@@ -244,7 +293,15 @@ document.addEventListener('dragover', function(e) {
 document.addEventListener('drop', function(e) {
     // 检查是否有文件被拖放
     const dataTransfer = e.dataTransfer;
-    if (dataTransfer && (dataTransfer.files.length > 0 || (dataTransfer.items && dataTransfer.items.length > 0))) {
+    if (!dataTransfer) {
+        return;
+    }
+    
+    // 检查是否有文件
+    const hasFiles = (dataTransfer.files && dataTransfer.files.length > 0) || 
+                  (dataTransfer.items && dataTransfer.items.length > 0);
+    
+    if (hasFiles) {
         // 如果事件目标不是 dropZone 或 contentArea，则处理它
         const target = e.target;
         const isDropZone = dropZone.contains(target);

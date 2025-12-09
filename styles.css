@@ -106,7 +106,7 @@ header p {
 }
 
 .clear-btn {
-    background: #ff6b6b;
+    background: #6c757d;
     color: white;
     border: none;
     padding: 8px 16px;
@@ -117,7 +117,7 @@ header p {
 }
 
 .clear-btn:hover {
-    background: #ff5252;
+    background: #5a6268;
 }
 
 .content-area {
@@ -154,28 +154,37 @@ body.fullscreen-mode .content-area.drag-over {
     display: none;
     position: fixed;
     top: 20px;
-    right: 20px;
-    background: #ff6b6b;
+    left: 20px;
+    background: #6c757d;
     color: white;
     border: none;
-    padding: 12px 24px;
+    padding: 10px 20px;
     border-radius: 8px;
     cursor: pointer;
-    font-size: 1em;
+    font-size: 0.95em;
     font-weight: 500;
     transition: all 0.3s ease;
     z-index: 1000;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 body.fullscreen-mode .clear-btn-fullscreen {
-    display: block;
+    display: flex;
 }
 
 .clear-btn-fullscreen:hover {
-    background: #ff5252;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+    background: #5a6268;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.back-icon {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
 }
 
 .markdown-content {
