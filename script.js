@@ -19,6 +19,26 @@ if (typeof marked !== 'undefined') {
     });
 }
 
+// 保存原始标题
+const originalTitle = document.title;
+
+// 从 Markdown 内容中提取第一个标题
+function extractTitleFromMarkdown(content) {
+    if (!content) return null;
+    
+    const lines = content.split('\n');
+    for (const line of lines) {
+        const trimmedLine = line.trim();
+        // 匹配 Markdown 标题（# 标题 或 ## 标题 等）
+        const titleMatch = trimmedLine.match(/^#{1,6}\s+(.+)$/);
+        if (titleMatch && titleMatch[1]) {
+            // 返回标题文本（去除可能的格式标记）
+            return titleMatch[1].trim();
+        }
+    }
+    return null;
+}
+
 // 处理文件读取和渲染
 function handleFile(file) {
     // 不再在这里检查文件扩展名，因为 handleFileWithCheck 已经处理了
@@ -26,6 +46,19 @@ function handleFile(file) {
     
     reader.onload = function(e) {
         const content = e.target.result;
+        
+        // 提取标题并设置为标签页标题
+        const title = extractTitleFromMarkdown(content);
+        if (title) {
+            document.title = title;
+        } else {
+            // 如果没有找到标题，使用文件名（去除扩展名）
+            const fileName = file.name || '';
+            const nameWithoutExt = fileName.replace(/\.(md|markdown)$/i, '');
+            if (nameWithoutExt) {
+                document.title = nameWithoutExt;
+            }
+        }
         
         // 渲染 Markdown
         if (typeof marked !== 'undefined') {
@@ -253,6 +286,9 @@ function clearContent() {
     markdownContent.innerHTML = '';
     fileInput.value = '';
     document.body.classList.remove('fullscreen-mode');
+    
+    // 恢复原始标题
+    document.title = originalTitle;
     
     // 滚动到顶部
     window.scrollTo({ top: 0, behavior: 'smooth' });
