@@ -30,8 +30,10 @@ function handleFile(file) {
         // 渲染 Markdown
         if (typeof marked !== 'undefined') {
             markdownContent.innerHTML = marked.parse(content);
+            // 为代码块添加复制按钮
+            addCopyButtonsToCodeBlocks();
         } else {
-            markdownContent.textContent = 'Markdown 解析库加载失败，请刷新页面重试。';
+            markdownContent.textContent = 'Failed to load Markdown parser library. Please refresh the page and try again.';
         }
         
         // 进入全屏模式：隐藏初始界面，显示内容区域
@@ -44,7 +46,7 @@ function handleFile(file) {
     };
     
     reader.onerror = function() {
-        alert('读取文件失败，请重试。');
+            alert('Failed to read file. Please try again.');
     };
     
     reader.readAsText(file, 'UTF-8');
@@ -165,6 +167,81 @@ function openFilePicker() {
     }
 }
 
+// 为代码块添加复制按钮
+function addCopyButtonsToCodeBlocks() {
+    const codeBlocks = markdownContent.querySelectorAll('pre code');
+    
+    codeBlocks.forEach((codeElement) => {
+        const preElement = codeElement.parentElement;
+        
+        // 避免重复添加按钮
+        if (preElement.querySelector('.copy-code-btn')) {
+            return;
+        }
+        
+        // 创建复制按钮
+        const copyButton = document.createElement('button');
+        copyButton.className = 'copy-code-btn';
+        copyButton.setAttribute('aria-label', '复制代码');
+        copyButton.innerHTML = `
+            <svg class="copy-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+            <svg class="check-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+                <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+        `;
+        
+        // 设置 pre 元素为相对定位，以便按钮可以绝对定位
+        preElement.style.position = 'relative';
+        
+        // 添加点击事件
+        copyButton.addEventListener('click', async function() {
+            const codeText = codeElement.textContent || codeElement.innerText;
+            
+            try {
+                await navigator.clipboard.writeText(codeText);
+                // 显示成功状态
+                copyButton.classList.add('copied');
+                const copyIcon = copyButton.querySelector('.copy-icon');
+                const checkIcon = copyButton.querySelector('.check-icon');
+                if (copyIcon) copyIcon.style.display = 'none';
+                if (checkIcon) checkIcon.style.display = 'block';
+                
+                // 显示通知
+                showTemporaryNotification('代码已复制到剪贴板', 2000);
+                
+                // 2秒后恢复原状
+                setTimeout(() => {
+                    copyButton.classList.remove('copied');
+                    if (copyIcon) copyIcon.style.display = 'block';
+                    if (checkIcon) checkIcon.style.display = 'none';
+                }, 2000);
+            } catch (err) {
+                console.error('复制失败:', err);
+                // 降级方案：使用传统方法
+                const textArea = document.createElement('textarea');
+                textArea.value = codeText;
+                textArea.style.position = 'fixed';
+                textArea.style.opacity = '0';
+                document.body.appendChild(textArea);
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    showTemporaryNotification('代码已复制到剪贴板', 2000);
+                } catch (fallbackErr) {
+                    showTemporaryNotification('复制失败，请手动选择复制', 3000);
+                }
+                document.body.removeChild(textArea);
+            }
+        });
+        
+        // 将按钮添加到 pre 元素
+        preElement.appendChild(copyButton);
+    });
+}
+
 // 清除功能
 function clearContent() {
     // 恢复初始界面
@@ -192,7 +269,7 @@ function handleDrop(e) {
     const dataTransfer = e.dataTransfer;
     if (!dataTransfer) {
         console.warn('dataTransfer 对象不存在');
-        alert('dataTransfer 对象不存在');
+        alert('dataTransfer object does not exist');
         return;
     }
     
@@ -205,6 +282,20 @@ function handleDrop(e) {
         dropEffect: dataTransfer.dropEffect
     });
 
+    // 首先检查是否是从编辑器拖放的（只有字符串类型的 items，没有文件）
+    const hasStringItems = dataTransfer?.items && Array.from(dataTransfer.items).some(item => 
+        item.kind === 'string'
+    );
+    const hasFileItems = dataTransfer?.items && Array.from(dataTransfer.items).some(item => 
+        item.kind === 'file'
+    );
+    const hasFiles = dataTransfer?.files && dataTransfer.files.length > 0;
+    
+    // 如果只有字符串类型的 items，没有文件类型的 items 和 files，说明是从编辑器拖放的，直接忽略
+    if (hasStringItems && !hasFileItems && !hasFiles) {
+        console.log('检测到从编辑器拖放，忽略操作');
+        return;
+    }
     
     let fileFound = false;
     let file = null;
@@ -289,54 +380,6 @@ function handleDrop(e) {
     if (fileFound && file) {
         handleFileWithCheck(file);
     } else {
-        // 检查是否只有字符串类型的 items（可能是从编辑器拖放的）
-        const hasStringItems = dataTransfer?.items && Array.from(dataTransfer.items).some(item => 
-            item.kind === 'string'
-        );
-        const hasFileItems = dataTransfer?.items && Array.from(dataTransfer.items).some(item => 
-            item.kind === 'file'
-        );
-        
-        // 如果只有字符串类型的 items，说明可能是从编辑器拖放的
-        if (hasStringItems && !hasFileItems && (!dataTransfer?.files || dataTransfer.files.length === 0)) {
-            console.log('检测到从编辑器拖放，尝试自动打开文件选择器');
-            
-            // 收集字符串类型的 items
-            const stringItems = [];
-            for (let i = 0; i < dataTransfer.items.length; i++) {
-                const item = dataTransfer.items[i];
-                if (item.kind === 'string') {
-                    const uriListTypes = [
-                        'text/uri-list',
-                        'text/plain',
-                        'application/vnd.code.uri-list'
-                    ];
-                    if (uriListTypes.includes(item.type) || item.type.startsWith('text/')) {
-                        stringItems.push(item);
-                    }
-                }
-            }
-            
-            // 异步提取文件名并打开文件选择器
-            (async () => {
-                const extractedFileName = await extractFileNameFromStringItems(stringItems);
-                
-                // 显示友好提示
-                if (extractedFileName) {
-                    showTemporaryNotification(`检测到文件：${extractedFileName}，正在打开文件选择器...`, 2500);
-                } else {
-                    showTemporaryNotification('检测到编辑器拖放，正在打开文件选择器...', 2000);
-                }
-                
-                // 延迟一点后自动打开文件选择器（让用户看到提示）
-                setTimeout(() => {
-                    openFilePicker();
-                }, 300);
-            })();
-            
-            return;
-        }
-        
         // 调试信息（生产环境也输出，方便排查问题）
         // 确保 dataTransfer 存在后再访问其属性
         const debugInfo = {
@@ -363,7 +406,7 @@ function handleDrop(e) {
                 } catch (err) {
                     debugInfo.items.push({
                         kind: 'error',
-                        type: `无法访问 item ${i}: ${err.message}`
+                        type: `Cannot access item ${i}: ${err.message}`
                     });
                 }
             }
@@ -384,8 +427,8 @@ function handleDrop(e) {
         
         console.warn('未找到文件，调试信息:', debugInfo);
         // 修复 alert：将对象转换为 JSON 字符串
-        alert('未找到文件，调试信息:\n' + JSON.stringify(debugInfo, null, 2));
-        alert('请拖放 Markdown 文件 (.md 或 .markdown)');
+        // alert('File not found. Debug info:\n' + JSON.stringify(debugInfo, null, 2));
+        alert('Please drop a Markdown file (.md or .markdown)');
     }
 }
 
@@ -394,7 +437,7 @@ function handleFileWithCheck(file) {
     // 验证文件对象
     if (!file || !(file instanceof File)) {
         console.warn('无效的文件对象:', file);
-        alert('请拖放 Markdown 文件 (.md 或 .markdown)');
+        alert('Please drop a Markdown file (.md or .markdown)');
         return;
     }
     
@@ -441,7 +484,7 @@ function handleFileWithCheck(file) {
         if (isMarkdown) {
             handleFile(file);
         } else {
-            alert('请拖放 Markdown 文件 (.md 或 .markdown)');
+            alert('Please drop a Markdown file (.md or .markdown)');
         }
     };
     
@@ -450,7 +493,7 @@ function handleFileWithCheck(file) {
         if (!fileName || fileName === '' || !fileName.includes('.')) {
             handleFile(file);
         } else {
-            alert('读取文件失败，请重试。');
+            alert('Failed to read file. Please try again.');
         }
     };
     

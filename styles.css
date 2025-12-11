@@ -22,7 +22,24 @@
 }
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Inter', 'Helvetica Neue', sans-serif;
+    /* 字体设置 - 可以修改为您喜欢的字体 */
+    /* 当前使用系统字体栈，支持中英文混排 */
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Inter', 'Helvetica Neue', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Source Han Sans SC', sans-serif;
+    
+    /* 其他常用字体选项（取消注释以使用）：
+     * 1. 思源黑体（推荐中文阅读）：
+     *    font-family: 'Source Han Sans SC', 'Noto Sans SC', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+     * 
+     * 2. Inter（现代英文）：
+     *    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+     * 
+     * 3. Roboto（Google 字体）：
+     *    font-family: 'Roboto', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+     * 
+     * 4. 苹方（macOS 中文）：
+     *    font-family: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+     */
+    
     background: var(--primary-bg);
     min-height: 100vh;
     padding: 24px;
@@ -459,7 +476,20 @@ body.fullscreen-mode .clear-btn-fullscreen {
     background: rgba(99, 102, 241, 0.08);
     padding: 0.2em 0.5em;
     border-radius: 6px;
-    font-family: 'SF Mono', 'Monaco', 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+    /* 代码字体设置 - 可以修改为您喜欢的等宽字体 */
+    font-family: 'SF Mono', 'Monaco', 'Cascadia Code', 'Roboto Mono', 'JetBrains Mono', 'Fira Code', Consolas, 'Courier New', monospace;
+    
+    /* 其他常用代码字体选项（取消注释以使用）：
+     * 1. JetBrains Mono（推荐）：
+     *    font-family: 'JetBrains Mono', 'SF Mono', 'Monaco', Consolas, monospace;
+     * 
+     * 2. Fira Code（带连字）：
+     *    font-family: 'Fira Code', 'SF Mono', 'Monaco', Consolas, monospace;
+     * 
+     * 3. Cascadia Code（Windows）：
+     *    font-family: 'Cascadia Code', 'Consolas', 'Courier New', monospace;
+     */
+    
     font-size: 0.9em;
     color: #6366f1;
     border: none;
@@ -475,6 +505,56 @@ body.fullscreen-mode .clear-btn-fullscreen {
     border: none;
     box-shadow: var(--shadow-md);
     position: relative;
+}
+
+/* 代码块复制按钮 */
+.copy-code-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #e5e7eb;
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0;
+    transition: all var(--transition-fast);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    z-index: 10;
+}
+
+.markdown-content pre:hover .copy-code-btn {
+    opacity: 1;
+}
+
+.copy-code-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
+    transform: translateY(-1px);
+}
+
+.copy-code-btn:active {
+    transform: translateY(0);
+}
+
+.copy-code-btn.copied {
+    background: rgba(34, 197, 94, 0.2);
+    border-color: rgba(34, 197, 94, 0.4);
+    color: #4ade80;
+}
+
+.copy-icon,
+.check-icon {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    display: block;
 }
 
 .markdown-content pre code {
@@ -645,6 +725,18 @@ body.fullscreen-mode .clear-btn-fullscreen {
 
     .markdown-content h3 {
         font-size: 1.35em;
+    }
+
+    .copy-code-btn {
+        top: 8px;
+        right: 8px;
+        padding: 6px 10px;
+    }
+
+    .copy-icon,
+    .check-icon {
+        width: 14px;
+        height: 14px;
     }
 }
 
