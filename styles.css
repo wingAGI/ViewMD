@@ -168,7 +168,7 @@ header p {
 }
 
 .drop-zone:hover .drop-icon {
-    color: #818cf8;
+    color: var(--text-tertiary);
     opacity: 0.85;
     transform: translateY(-4px) scale(1.05);
 }
