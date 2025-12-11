@@ -39,6 +39,48 @@ function extractTitleFromMarkdown(content) {
     return null;
 }
 
+// 渲染 Markdown 内容（从文件或字符串）
+function renderMarkdownContent(content, fileName) {
+    // 保存内容到 sessionStorage，以便浏览器回退时恢复
+    try {
+        sessionStorage.setItem('markdownContent', content);
+        if (fileName) {
+            sessionStorage.setItem('markdownFileName', fileName);
+        }
+    } catch (err) {
+        console.warn('无法保存到 sessionStorage:', err);
+    }
+    
+    // 提取标题并设置为标签页标题
+    const title = extractTitleFromMarkdown(content);
+    if (title) {
+        document.title = title;
+    } else {
+        // 如果没有找到标题，使用文件名（去除扩展名）
+        const nameWithoutExt = (fileName || '').replace(/\.(md|markdown)$/i, '');
+        if (nameWithoutExt) {
+            document.title = nameWithoutExt;
+        }
+    }
+    
+    // 渲染 Markdown
+    if (typeof marked !== 'undefined') {
+        markdownContent.innerHTML = marked.parse(content);
+        // 为代码块添加复制按钮
+        addCopyButtonsToCodeBlocks();
+    } else {
+        markdownContent.textContent = 'Failed to load Markdown parser library. Please refresh the page and try again.';
+    }
+    
+    // 进入全屏模式：隐藏初始界面，显示内容区域
+    document.querySelector('header').style.display = 'none';
+    dropZone.style.display = 'none';
+    fileInfo.style.display = 'none';
+    contentArea.style.display = 'block';
+    clearBtnFullscreen.style.display = 'block';
+    document.body.classList.add('fullscreen-mode');
+}
+
 // 处理文件读取和渲染
 function handleFile(file) {
     // 不再在这里检查文件扩展名，因为 handleFileWithCheck 已经处理了
@@ -46,36 +88,7 @@ function handleFile(file) {
     
     reader.onload = function(e) {
         const content = e.target.result;
-        
-        // 提取标题并设置为标签页标题
-        const title = extractTitleFromMarkdown(content);
-        if (title) {
-            document.title = title;
-        } else {
-            // 如果没有找到标题，使用文件名（去除扩展名）
-            const fileName = file.name || '';
-            const nameWithoutExt = fileName.replace(/\.(md|markdown)$/i, '');
-            if (nameWithoutExt) {
-                document.title = nameWithoutExt;
-            }
-        }
-        
-        // 渲染 Markdown
-        if (typeof marked !== 'undefined') {
-            markdownContent.innerHTML = marked.parse(content);
-            // 为代码块添加复制按钮
-            addCopyButtonsToCodeBlocks();
-        } else {
-            markdownContent.textContent = 'Failed to load Markdown parser library. Please refresh the page and try again.';
-        }
-        
-        // 进入全屏模式：隐藏初始界面，显示内容区域
-        document.querySelector('header').style.display = 'none';
-        dropZone.style.display = 'none';
-        fileInfo.style.display = 'none';
-        contentArea.style.display = 'block';
-        clearBtnFullscreen.style.display = 'block';
-        document.body.classList.add('fullscreen-mode');
+        renderMarkdownContent(content, file.name);
     };
     
     reader.onerror = function() {
@@ -277,6 +290,14 @@ function addCopyButtonsToCodeBlocks() {
 
 // 清除功能
 function clearContent() {
+    // 清除 sessionStorage
+    try {
+        sessionStorage.removeItem('markdownContent');
+        sessionStorage.removeItem('markdownFileName');
+    } catch (err) {
+        console.warn('无法清除 sessionStorage:', err);
+    }
+    
     // 恢复初始界面
     document.querySelector('header').style.display = 'block';
     dropZone.style.display = 'block';
@@ -292,6 +313,22 @@ function clearContent() {
     
     // 滚动到顶部
     window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// 恢复保存的 Markdown 内容
+function restoreMarkdownContent() {
+    try {
+        const savedContent = sessionStorage.getItem('markdownContent');
+        const savedFileName = sessionStorage.getItem('markdownFileName');
+        
+        if (savedContent) {
+            renderMarkdownContent(savedContent, savedFileName);
+            return true;
+        }
+    } catch (err) {
+        console.warn('无法从 sessionStorage 恢复内容:', err);
+    }
+    return false;
 }
 
 // 清除按钮（初始界面的）
@@ -592,3 +629,18 @@ document.addEventListener('drop', function(e) {
         }
     }
 }, false);
+
+// 页面加载时恢复保存的内容
+document.addEventListener('DOMContentLoaded', function() {
+    restoreMarkdownContent();
+});
+
+// 处理浏览器前进/后退事件（使用 pageshow 事件，支持 bfcache）
+// pageshow 事件在页面显示时触发，包括从 bfcache 恢复和正常加载
+window.addEventListener('pageshow', function(event) {
+    // 如果页面是从 bfcache（浏览器缓存）恢复的，需要恢复内容
+    // 对于正常加载的情况，DOMContentLoaded 已经处理了
+    if (event.persisted) {
+        restoreMarkdownContent();
+    }
+});
