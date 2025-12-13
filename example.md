@@ -1,4 +1,4 @@
-# 🎨 View Markdown - Elegant Markdown Viewer
+# 🎨 View Markdown - Full Screen Online Markdown Viewer
 
 > **Beautifully Rendered Markdown. Full-screen. Immersive.**
 
