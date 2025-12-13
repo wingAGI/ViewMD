@@ -1,202 +1,189 @@
 # 🎨 View Markdown - Full Screen Online Markdown Viewer
 
-> **Beautifully Rendered Markdown. Full-screen. Immersive.**
-
-Welcome to View Markdown! A Markdown viewer designed for elegant reading. Whether it's technical documentation, blog posts, or personal notes, everything is presented in the most comfortable way.
+> **Full-screen Markdown reading. No sidebar.**
 
 ---
 
-## ✨ Core Features
+## 🎯 The Hero Message
 
-### 🎯 Immersive Experience
-- **Full-screen Mode**: Focus on content with distraction-free reading
-- **Elegant Typography**: Carefully designed fonts, spacing, and color schemes
-- **Smooth Animations**: Silky transitions that enhance the reading experience
+**Full-screen Markdown reading. No sidebar.**
 
-### 🚀 Convenient Operations
-- **Drag & Drop Support**: Simply drag files to view instantly
-- **One-Click Clear**: Easily switch between different documents
-- **Responsive Design**: Perfect adaptation to various device sizes
+**Read Markdown. Not edit it.**
 
-### 💎 Beautiful Rendering
-- **Syntax Highlighting**: Support for multiple programming languages
-- **Styled Tables**: Clear table formatting for easy reading
-- **Image Optimization**: Automatic adaptation while maintaining clarity
+This is what pure reading looks like. No distractions. No sidebars. Just you and your content, beautifully rendered across the entire screen.
 
 ---
 
-## 📝 Markdown Syntax Showcase
+## ⚖️ The Problem We Solve
 
-### Heading Levels
+### VS Code Preview is Too Small
+
+**Left Side: VS Code / Online Editors**
+- Tiny preview pane squeezed into a corner
+- Sidebar taking up valuable screen space
+- Editor tools you don't need when reading
+- Cluttered interface distracting from content
+
+**Right Side: View Markdown**
+- Clean, full-screen reading experience
+- Every pixel dedicated to your content
+- Zero distractions, maximum focus
+- Built for one thing: reading
+
+**Most online tools are editors.**
+
+**We're not. We're a reader.**
+
+---
+
+## ✨ Core Value Propositions
+
+### Why View Markdown?
+
+✅ **Full Screen**
+- Immersive reading experience
+- No wasted space, no distractions
+- Content-first design
+
+✅ **No Download**
+- Works instantly in your browser
+- No installation, no setup
+- Just drag and drop
+
+✅ **Browser-Based**
+- Access from anywhere
+- Works on any device
+- No app required
+
+✅ **Privacy-First**
+- No tracking, no analytics
+- Your files never leave your device
+- Zero data collection
+
+---
+
+## 🤖 Built for AI-Generated Content
+
+**Built for reading AI-generated Markdown.**
+
+When Cursor, Claude Code, or ChatGPT generates long Markdown documents, you need a proper reader. Not an editor. Not a tiny preview pane.
+
+**View Markdown is built for this.**
+
+Perfect for:
+- 📄 AI-generated documentation
+- 📝 Long-form content from LLMs
+- 📚 Technical specifications
+- ✍️ Blog posts and articles
+
+---
+
+## 🎯 The Reading Experience
+
+### What Makes It Different?
+
+**It's not about features. It's about the experience.**
+
+- **Typography that breathes**: Carefully crafted fonts and spacing
+- **Code that shines**: Syntax highlighting that doesn't hurt your eyes
+- **Tables that make sense**: Clear formatting for easy scanning
+- **Images that fit**: Automatic optimization without losing quality
+
+### How It Works
+
+1. **Drag & Drop**: Drop your `.md` file onto the page
+2. **Full Screen**: Automatically enters immersive reading mode
+3. **Read**: Focus on content, nothing else
+4. **Done**: Click to clear and load another file
+
+That's it. No settings. No configuration. No learning curve.
+
+---
+
+## 💡 Use Cases
+
+### Perfect For:
+
+**AI-Generated Content**
+- Cursor/Claude Code output
+- ChatGPT long-form responses
+- Documentation from AI assistants
+
+**Technical Reading**
+- API documentation
+- Development guides
+- Code reviews and comments
+
+**Content Consumption**
+- Blog posts
+- Articles
+- Personal notes
+- Project documentation
+
+---
+
+## 🎨 Markdown Syntax Showcase
+
+### See It In Action
 
 # Heading 1
 ## Heading 2
 ### Heading 3
-#### Heading 4
-##### Heading 5
-###### Heading 6
 
-### Text Styles
+**Bold text**, *italic text*, `inline code`, and ~~strikethrough~~.
 
-This is **bold text**, this is *italic text*, and this is ~~strikethrough text~~.
+- Unordered lists
+- With nested items
+  - Like this
+  - And this
 
-You can also use `inline code` to highlight code snippets.
+1. Ordered lists
+2. With numbers
+3. And sub-items
 
-### Lists
+- [x] Completed tasks
+- [ ] Pending items
 
-#### Unordered List
-- First item
-- Second item
-  - Nested item 1
-  - Nested item 2
-- Third item
-
-#### Ordered List
-1. First step
-2. Second step
-3. Third step
-   1. Sub-step A
-   2. Sub-step B
-
-#### Task List
-- [x] Completed task
-- [ ] Pending task
-- [ ] Another todo item
-
-### Blockquotes
-
-> This is a blockquote. Blockquotes can be used to highlight important content or quote others.
-> 
-> They can contain multiple paragraphs, and each paragraph will maintain the quote format.
-
-### Code Blocks
-
-#### JavaScript Example
+> Beautiful blockquotes that stand out
 
 ```javascript
-// This is a JavaScript code example
+// Code blocks with syntax highlighting
 function greet(name) {
     return `Hello, ${name}!`;
 }
-
-const user = 'View Markdown';
-console.log(greet(user));
 ```
 
-#### Python Example
-
-```python
-# Python code example
-def fibonacci(n):
-    """Calculate Fibonacci sequence"""
-    if n <= 1:
-        return n
-    return fibonacci(n-1) + fibonacci(n-2)
-
-# Print first 10 Fibonacci numbers
-for i in range(10):
-    print(f"F({i}) = {fibonacci(i)}")
-```
-
-#### CSS Example
-
-```css
-/* Elegant CSS styling */
-.markdown-content {
-    max-width: 100%;
-    line-height: 1.75;
-    color: var(--text-primary);
-    font-size: 16px;
-}
-
-.markdown-content h1 {
-    font-size: 2.5em;
-    margin-top: 0.8em;
-    margin-bottom: 0.6em;
-    border-bottom: 2px solid var(--border-color);
-}
-```
-
-### Tables
-
-| Feature | Description | Status |
-|---------|-------------|--------|
-| Drag & Drop | Support direct drag of Markdown files | ✅ Implemented |
-| Full-screen Mode | Immersive reading experience | ✅ Implemented |
-| Syntax Highlighting | Support for multiple programming languages | ✅ Implemented |
-| Responsive Design | Mobile device adaptation | ✅ Implemented |
-| Dark Mode | Eye-friendly dark theme | 🚧 Planned |
-
-### Links
-
-- [GitHub](https://github.com)
-- [Markdown Official Documentation](https://daringfireball.net/projects/markdown/)
-- [Example Link](https://example.com)
-
-### Horizontal Rule
+| Tables | That | Look | Great |
+|--------|------|------|-------|
+| Clean  | Easy | To    | Read  |
 
 ---
 
-## 🎨 Use Cases
+## 🌟 The Philosophy
 
-### 📚 Technical Documentation
-Perfect for displaying API documentation, development guides, and technical specifications. Code block highlighting makes technical content more readable.
+**We believe reading should be simple.**
 
-### ✍️ Blog Posts
-Elegant typography makes your articles more readable, and full-screen mode provides an immersive reading experience.
+- No feature bloat
+- No unnecessary options
+- No learning required
+- Just pure, focused reading
 
-### 📝 Personal Notes
-Whether it's study notes, meeting minutes, or todo lists, everything is presented in the clearest way.
+**3 seconds to decide.**
 
-### 📊 Project Documentation
-Clearly display project descriptions, feature lists, and usage guides, helping team members quickly understand the project.
+**That's all Product Hunt users need.**
 
----
-
-## 💡 Usage Tips
-
-1. **Drag & Drop Files**: Simply drag `.md` or `.markdown` files onto the page to view
-2. **Full-screen Reading**: Automatically enters full-screen mode after file loads, focusing on content
-3. **Switch Files**: Click the clear button to quickly switch and view other files
-4. **Copy Code**: Hover over code blocks and click the copy button to copy code
+**This is what we deliver.**
 
 ---
 
-## 🌟 Design Philosophy
-
-View Markdown follows these design principles:
-
-- **Simplicity First**: Remove unnecessary elements, focus on content itself
-- **Elegant Typography**: Carefully adjusted fonts, line spacing, and margins to enhance reading comfort
-- **Smooth Experience**: Smooth animations and transitions make the usage process more enjoyable
-- **Responsive Design**: Whether desktop or mobile devices, everyone gets the best experience
-
----
-
-## 📱 Responsive Support
-
-View Markdown perfectly adapts to various devices:
-
-- 💻 **Desktop**: Large screen enjoyment, making full use of space
-- 📱 **Mobile**: Optimized layout, touch-friendly
-- 📟 **Tablet**: Medium screen, balanced experience
-
----
-
-## 🎯 Get Started
+## 🚀 Get Started
 
 1. Open View Markdown
-2. Drag & drop or select your Markdown file
-3. Enjoy the elegant reading experience!
+2. Drop your Markdown file
+3. Read
+
+**That's it.**
 
 ---
 
-## 📄 About
-
-View Markdown is an open-source project dedicated to providing the best Markdown reading experience.
-
-**Make reading a pleasure!** ✨
-
----
-
-*Last updated: 2024*
+*Built for readers. Not editors.*
